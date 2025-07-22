@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:messenger_app/domain/constants/cubits/themecubit.dart';
 import 'package:messenger_app/repositary/screens/widgets/Uihelper.dart';
 
 class Onboardingscreen extends StatelessWidget {
@@ -7,10 +9,19 @@ class Onboardingscreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      appBar: AppBar(
+        elevation: 0,
+        actions: [
+          IconButton(
+              onPressed: () {
+                BlocProvider.of<Themecubit>(context).toggleTheme();
+              },
+              icon: Icon(Icons.dark_mode))
+        ],
+      ),
       body: Center(
         child: Padding(
-          padding: const EdgeInsets.only(top: 100),
+          padding: const EdgeInsets.only(top: 30),
           child: Column(
             children: [
               Uihelper.CustomImage(
@@ -23,6 +34,7 @@ class Onboardingscreen extends StatelessWidget {
                   text:
                       "Connect easily with \n your family and friends\n over countries",
                   fontsize: 25,
+                  fontweight: FontWeight.bold,
                   context: context),
               SizedBox(
                 height: 180,
