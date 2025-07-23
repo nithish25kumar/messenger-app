@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "308748127974",
+    "project_id": "zynk-65b98",
+    "storage_bucket": "zynk-65b98.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:308748127974:android:0bf32fcb1b9db0cf387527",
+        "android_client_info": {
+          "package_name": "com.example.messenger_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBbRZeXXG2BEwPE15vfe93TmiRGfCNVZ28"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
