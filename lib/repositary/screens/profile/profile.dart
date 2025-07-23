@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:messenger_app/repositary/screens/bottomnav/bottomNavscreen.dart';
 import 'package:messenger_app/repositary/screens/otpscreen/otpscreen.dart';
 import 'package:messenger_app/repositary/screens/widgets/Uihelper.dart';
 
@@ -58,8 +59,12 @@ class Profile extends StatelessWidget {
           ],
         ),
       ),
-      floatingActionButton:
-          Uihelper.CustomButton(buttonnname: "Save", callback: () {}),
+      floatingActionButton: Uihelper.CustomButton(
+          buttonnname: "Save",
+          callback: () {
+            Navigator.pushReplacement(
+                context, MaterialPageRoute(builder: (_) => Bottomnavscreen()));
+          }),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
