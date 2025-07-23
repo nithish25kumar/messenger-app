@@ -57,23 +57,25 @@ class Contactscreen extends StatelessWidget {
             SizedBox(
               height: 10,
             ),
-            ListView.builder(
-              itemBuilder: (context, index) {
-                return ListTile(
-                  leading: Uihelper.CustomImage(
-                      imgurl: arrContacts[index]["img"].toString()),
-                  title: Uihelper.CustomText(
-                      text: arrContacts[index]["name"].toString(),
-                      fontsize: 14,
-                      fontweight: FontWeight.w600,
-                      context: context),
-                  subtitle: Uihelper.CustomText(
-                      text: arrContacts[index]["lastseen"].toString(),
-                      fontsize: 12,
-                      context: context),
-                );
-              },
-              itemCount: arrContacts.length,
+            Expanded(
+              child: ListView.builder(
+                itemBuilder: (context, index) {
+                  return ListTile(
+                    leading: Uihelper.CustomImage(
+                        imgurl: arrContacts[index]["img"].toString()),
+                    title: Uihelper.CustomText(
+                        text: arrContacts[index]["name"].toString(),
+                        fontsize: 14,
+                        fontweight: FontWeight.w600,
+                        context: context),
+                    subtitle: Uihelper.CustomText(
+                        text: arrContacts[index]["lastseen"].toString(),
+                        fontsize: 12,
+                        context: context),
+                  );
+                },
+                itemCount: arrContacts.length,
+              ),
             )
           ],
         ),
