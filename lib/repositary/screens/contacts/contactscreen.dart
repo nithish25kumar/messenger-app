@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:messenger_app/repositary/screens/widgets/Uihelper.dart';
-
 import '../../../domain/constants/appcolors.dart';
 
 class Contactscreen extends StatelessWidget {
+  final User currentUser;
+  Contactscreen({required this.currentUser});
+
   TextEditingController searchController = TextEditingController();
+
   var arrContacts = [
     {
       "img": "Frame 3293.png",
@@ -35,48 +39,61 @@ class Contactscreen extends StatelessWidget {
             : AppColors.scaffoldlight,
         elevation: 0,
         title: Uihelper.CustomText(
-            text: "Contacts",
-            fontsize: 25,
-            fontweight: FontWeight.bold,
-            fontfamily: "bold",
-            context: context),
+          text: "Contacts",
+          fontsize: 25,
+          fontweight: FontWeight.bold,
+          fontfamily: "bold",
+          context: context,
+        ),
         actions: [IconButton(onPressed: () {}, icon: Icon(Icons.add))],
       ),
       body: Center(
         child: Column(
           children: [
-            SizedBox(
-              height: 20,
+            SizedBox(height: 20),
+            ListTile(
+              leading: CircleAvatar(
+                backgroundImage: NetworkImage(currentUser.photoURL ?? ''),
+                radius: 30,
+              ),
+              title: Text(
+                currentUser.displayName ?? '',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+              subtitle:
+                  Text(currentUser.email ?? '', style: TextStyle(fontSize: 13)),
             ),
+            SizedBox(height: 10),
             Uihelper.CustomTextField(
-                controller: searchController,
-                text: "Search",
-                textinputtype: TextInputType.text,
-                context: context,
-                icondata: Icons.search),
-            SizedBox(
-              height: 10,
+              controller: searchController,
+              text: "Search",
+              textinputtype: TextInputType.text,
+              context: context,
+              icondata: Icons.search,
             ),
+            SizedBox(height: 10),
             Expanded(
               child: ListView.builder(
+                itemCount: arrContacts.length,
                 itemBuilder: (context, index) {
                   return ListTile(
                     leading: Uihelper.CustomImage(
                         imgurl: arrContacts[index]["img"].toString()),
                     title: Uihelper.CustomText(
-                        text: arrContacts[index]["name"].toString(),
-                        fontsize: 14,
-                        fontweight: FontWeight.w600,
-                        context: context),
+                      text: arrContacts[index]["name"].toString(),
+                      fontsize: 14,
+                      fontweight: FontWeight.w600,
+                      context: context,
+                    ),
                     subtitle: Uihelper.CustomText(
-                        text: arrContacts[index]["lastseen"].toString(),
-                        fontsize: 12,
-                        context: context),
+                      text: arrContacts[index]["lastseen"].toString(),
+                      fontsize: 12,
+                      context: context,
+                    ),
                   );
                 },
-                itemCount: arrContacts.length,
               ),
-            )
+            ),
           ],
         ),
       ),

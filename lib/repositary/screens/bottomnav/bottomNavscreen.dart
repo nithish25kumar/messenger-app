@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:messenger_app/repositary/screens/chats/chatscreen.dart';
 import 'package:messenger_app/repositary/screens/contacts/contactscreen.dart';
 import 'package:messenger_app/repositary/screens/more/morescreen.dart';
-
 import '../../../domain/constants/appcolors.dart';
 
 class Bottomnavscreen extends StatefulWidget {
@@ -14,12 +14,24 @@ class Bottomnavscreen extends StatefulWidget {
 
 class _BottomnavscreenState extends State<Bottomnavscreen> {
   int currentIndex = 1;
-  List<Widget> pages = [Contactscreen(), Chatscreen(), Morescreen()];
+  late List<Widget> pages;
+
+  @override
+  void initState() {
+    super.initState();
+    final user = FirebaseAuth.instance.currentUser;
+    pages = [
+      Contactscreen(currentUser: user!),
+      Chatscreen(),
+      Morescreen(),
+    ];
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       bottomNavigationBar: BottomNavigationBar(
-        items: [
+        items: const [
           BottomNavigationBarItem(
               icon: Icon(Icons.person_2_outlined), label: "Contacts"),
           BottomNavigationBarItem(
