@@ -3,6 +3,8 @@ import 'package:messenger_app/repositary/screens/chats/chatscreen.dart';
 import 'package:messenger_app/repositary/screens/contacts/contactscreen.dart';
 import 'package:messenger_app/repositary/screens/more/morescreen.dart';
 
+import '../../../domain/constants/appcolors.dart';
+
 class Bottomnavscreen extends StatefulWidget {
   const Bottomnavscreen({super.key});
 
@@ -11,7 +13,7 @@ class Bottomnavscreen extends StatefulWidget {
 }
 
 class _BottomnavscreenState extends State<Bottomnavscreen> {
-  int currentIndex = 0;
+  int currentIndex = 1;
   List<Widget> pages = [Contactscreen(), Chatscreen(), Morescreen()];
   @override
   Widget build(BuildContext context) {
@@ -30,6 +32,15 @@ class _BottomnavscreenState extends State<Bottomnavscreen> {
             currentIndex = value;
           });
         },
+        showSelectedLabels: false,
+        showUnselectedLabels: false,
+        backgroundColor: Theme.of(context).brightness == Brightness.dark
+            ? AppColors.bottomdark
+            : AppColors.bottomlight,
+        selectedIconTheme: IconThemeData(
+            color: Theme.of(context).brightness == Brightness.dark
+                ? AppColors.icondarkmode
+                : AppColors.iconlightmode),
       ),
       body: IndexedStack(
         children: pages,
