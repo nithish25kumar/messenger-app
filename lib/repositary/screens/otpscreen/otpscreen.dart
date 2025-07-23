@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:messenger_app/repositary/screens/login/loginscreen.dart';
+import 'package:messenger_app/repositary/screens/profile/profile.dart';
 import 'package:messenger_app/repositary/screens/widgets/Uihelper.dart';
 import 'package:pinput/pinput.dart';
 import '../../../domain/constants/appcolors.dart';
@@ -84,16 +85,31 @@ class _OtpscreenState extends State<Otpscreen> {
               context: context,
             ),
             SizedBox(height: 20),
-            Pinput(
-              controller: otpController,
-              defaultPinTheme: defaultPinTheme,
-              focusedPinTheme: focusedPinTheme,
-              submittedPinTheme: submittedPinTheme,
-              length: 4,
-            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Pinput(
+                onCompleted: (value) {
+                  Navigator.pushReplacement(
+                      context, MaterialPageRoute(builder: (_) => Profile()));
+                },
+                autofocus: true,
+                controller: otpController,
+                defaultPinTheme: defaultPinTheme,
+                focusedPinTheme: focusedPinTheme,
+                submittedPinTheme: submittedPinTheme,
+              ),
+            )
           ],
         ),
       ),
+      floatingActionButton: TextButton(
+          onPressed: () {},
+          child: Uihelper.CustomText(
+              text: 'Resend Code',
+              fontsize: 20,
+              color: Colors.blue,
+              context: context)),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
 }
