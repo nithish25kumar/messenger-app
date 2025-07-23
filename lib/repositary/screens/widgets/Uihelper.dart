@@ -70,19 +70,35 @@ class Uihelper {
       child: TextField(
         controller: controller,
         keyboardType: textinputtype,
+        style: TextStyle(
+          color: Theme.of(context).brightness == Brightness.dark
+              ? AppColors.textdarkmode
+              : AppColors.textlightmode,
+        ),
         decoration: InputDecoration(
-            hintText: text,
-            prefixIcon: Icon(
-              icondata,
-              color: AppColors.iconlight,
-            ),
-            hintStyle: TextStyle(
-                color: Theme.of(context).brightness == Brightness.dark
-                    ? AppColors.hintdarkmode
-                    : AppColors.hintlightmode,
-                fontSize: 14),
-            border: InputBorder.none),
+          hintText: text,
+          prefixIcon: Icon(
+            icondata,
+            color: AppColors.iconlight,
+          ),
+          hintStyle: TextStyle(
+            color: Theme.of(context).brightness == Brightness.dark
+                ? AppColors.hintdarkmode
+                : AppColors.hintlightmode,
+            fontSize: 14,
+          ),
+          border: InputBorder.none,
+        ),
       ),
     );
+  }
+
+  static void showSnackBar(BuildContext context, String message) {
+    final snackBar = SnackBar(
+      content: Text(message),
+      behavior: SnackBarBehavior.floating,
+      backgroundColor: Colors.redAccent,
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 }

@@ -1,73 +1,118 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:messenger_app/repositary/screens/onboard/onboardingscreen.dart';
-import 'package:messenger_app/repositary/screens/otpscreen/otpscreen.dart';
-import 'package:messenger_app/repositary/screens/widgets/Uihelper.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:messenger_app/repositary/screens/bottomnav/bottomNavscreen.dart';
 
+import 'package:messenger_app/repositary/screens/widgets/Uihelper.dart';
 import '../../../domain/constants/appcolors.dart';
 
-class Loginscreen extends StatelessWidget {
-  TextEditingController phoneController = TextEditingController();
+class Loginscreen extends StatefulWidget {
+  @override
+  State<Loginscreen> createState() => _LoginscreenState();
+}
+
+class _LoginscreenState extends State<Loginscreen> {
+  final TextEditingController phoneController = TextEditingController();
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  bool isLoading = false;
+
+  Future<void> handleGoogleSignIn() async {
+    setState(() => isLoading = true);
+    try {
+      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+      if (googleUser == null) {
+        setState(() => isLoading = false);
+        return;
+      }
+
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
+
+      final AuthCredential credential = GoogleAuthProvider.credential(
+          accessToken: googleAuth.accessToken, idToken: googleAuth.idToken);
+
+      final UserCredential userCredential =
+          await _auth.signInWithCredential(credential);
+
+      final User? user = userCredential.user;
+      if (user == null) {
+        Uihelper.showSnackBar(context, "Google sign-in failed");
+        setState(() => isLoading = false);
+        return;
+      }
+
+      final phoneNumber = phoneController.text.trim();
+      if (phoneNumber.isEmpty) {
+        Uihelper.showSnackBar(context, "Please enter phone number");
+        setState(() => isLoading = false);
+        return;
+      }
+
+      await _firestore.collection("users").doc(user.uid).set({
+        "uid": user.uid,
+        "email": user.email,
+        "name": user.displayName,
+        "phone": phoneNumber,
+        "photoUrl": user.photoURL,
+        "createdAt": Timestamp.now(),
+      });
+
+      Navigator.pushReplacement(
+          context, MaterialPageRoute(builder: (_) => Bottomnavscreen()));
+    } catch (e) {
+      Uihelper.showSnackBar(context, "Error: ${e.toString()}");
+    }
+    setState(() => isLoading = false);
+  }
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).brightness == Brightness.dark
-            ? AppColors.scaffolddark
-            : AppColors.scaffoldlight,
+        backgroundColor:
+            isDark ? AppColors.scaffolddark : AppColors.scaffoldlight,
         elevation: 0,
         leading: IconButton(
-            onPressed: () {
-              Navigator.pushReplacement(context,
-                  MaterialPageRoute(builder: (_) => Onboardingscreen()));
-            },
-            icon: Icon(Icons.arrow_back_ios_new)),
+          icon: Icon(Icons.arrow_back_ios_new),
+          onPressed: () => Navigator.pop(context),
+        ),
       ),
       body: Padding(
-        padding: const EdgeInsets.only(
-          top: 100,
-        ),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 60),
         child: Center(
           child: SingleChildScrollView(
             child: Column(
               children: [
                 Uihelper.CustomText(
-                    text: "Enter Your Phone Number",
+                    text: "Sign in with Google",
                     fontsize: 26,
                     fontweight: FontWeight.bold,
                     context: context),
-                SizedBox(
-                  height: 20,
-                ),
-                Uihelper.CustomText(
-                    text: "Please confirm your country code and enter",
-                    fontsize: 15,
-                    context: context),
-                Uihelper.CustomText(
-                    text: "your phone number", fontsize: 15, context: context),
-                SizedBox(
-                  height: 50,
-                ),
+                SizedBox(height: 20),
                 Uihelper.CustomTextField(
-                    controller: phoneController,
-                    text: 'Phone Number',
-                    textinputtype: TextInputType.number,
-                    context: context,
-                    icondata: Icons.phone),
-                SizedBox(
-                  height: 350,
+                  controller: phoneController,
+                  text: 'Phone Number',
+                  textinputtype: TextInputType.phone,
+                  context: context,
+                  icondata: Icons.phone,
                 ),
+                SizedBox(height: 40),
               ],
             ),
           ),
         ),
       ),
-      floatingActionButton: Uihelper.CustomButton(
-          buttonnname: "Continue",
-          callback: () {
-            Navigator.pushReplacement(
-                context, MaterialPageRoute(builder: (_) => Otpscreen()));
-          }),
+      floatingActionButton: isLoading
+          ? CircularProgressIndicator()
+          : Uihelper.CustomButton(
+              buttonnname: "Continue with Google",
+              callback: handleGoogleSignIn,
+            ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }

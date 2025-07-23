@@ -1,3 +1,4 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:messenger_app/domain/constants/appthemes.dart';
@@ -5,7 +6,9 @@ import 'package:messenger_app/domain/constants/cubits/themecubit.dart';
 import 'package:messenger_app/domain/constants/cubits/themestates.dart';
 import 'package:messenger_app/repositary/screens/onboard/onboardingscreen.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(BlocProvider(create: (_) => Themecubit(), child: MyApp()));
 }
 
