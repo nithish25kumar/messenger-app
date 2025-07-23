@@ -61,12 +61,12 @@ class Uihelper {
       required IconData icondata}) {
     return Container(
       height: 45,
-      width: 360,
+      width: 330,
       decoration: BoxDecoration(
           color: Theme.of(context).brightness == Brightness.dark
               ? AppColors.containerdarkmode
               : AppColors.containerlightmode,
-          borderRadius: BorderRadius.circular(7)),
+          borderRadius: BorderRadius.circular(0)),
       child: TextField(
         controller: controller,
         keyboardType: textinputtype,
