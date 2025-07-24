@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:messenger_app/repositary/screens/bottomnav/bottomNavscreen.dart';
 import 'package:messenger_app/repositary/screens/widgets/Uihelper.dart';
 import '../../../domain/constants/appcolors.dart';
 
@@ -57,6 +58,12 @@ class _ChatScreenState extends State<ChatScreen> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppColors.buttonlightmode,
+        leading: IconButton(
+            onPressed: () {
+              Navigator.pushReplacement(context,
+                  MaterialPageRoute(builder: (_) => Bottomnavscreen()));
+            },
+            icon: Icon(Icons.arrow_back_ios_new)),
         title: Row(
           children: [
             CircleAvatar(
@@ -69,7 +76,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   ? const Icon(Icons.person, color: Colors.black)
                   : null,
             ),
-            const SizedBox(width: 10),
+            const SizedBox(width: 8),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -78,11 +85,6 @@ class _ChatScreenState extends State<ChatScreen> {
                   style: const TextStyle(
                       fontSize: 16, fontWeight: FontWeight.w600),
                 ),
-                if (widget.otherUser['email'] != null)
-                  Text(
-                    widget.otherUser['email'],
-                    style: const TextStyle(fontSize: 12, color: Colors.black54),
-                  ),
               ],
             ),
           ],
@@ -106,7 +108,14 @@ class _ChatScreenState extends State<ChatScreen> {
                 final messages = snapshot.data?.docs ?? [];
 
                 if (messages.isEmpty) {
-                  return const Center(child: Text("No messages yet"));
+                  return Center(
+                    child: Uihelper.CustomText(
+                      text: "Start the conversation!",
+                      fontsize: 16,
+                      context: context,
+                      fontweight: FontWeight.w500,
+                    ),
+                  );
                 }
 
                 return ListView.builder(
@@ -159,7 +168,6 @@ class _ChatScreenState extends State<ChatScreen> {
               },
             ),
           ),
-          const Divider(height: 1),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
             color: Colors.white,

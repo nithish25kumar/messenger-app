@@ -9,6 +9,10 @@ class ChatListScreen extends StatelessWidget {
 
   const ChatListScreen({super.key, required this.currentUser});
 
+  String getChatId(String uid1, String uid2) {
+    return uid1.hashCode <= uid2.hashCode ? '$uid1\_$uid2' : '$uid2\_$uid1';
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -20,7 +24,7 @@ class ChatListScreen extends StatelessWidget {
         backgroundColor:
             isDark ? AppColors.scaffolddark : AppColors.scaffoldlight,
         title: const Text(
-          'Chats',
+          'My Chats',
           style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
@@ -46,55 +50,85 @@ class ChatListScreen extends StatelessWidget {
               final userData = doc.data() as Map<String, dynamic>;
 
               return ListTile(
-                  contentPadding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  tileColor: isDark
-                      ? AppColors.containerdarkmode.withOpacity(0.4)
-                      : AppColors.containerlightmode,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                tileColor: isDark
+                    ? AppColors.containerdarkmode.withOpacity(0.4)
+                    : AppColors.containerlightmode,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                leading: CircleAvatar(
+                  radius: 25,
+                  backgroundColor:
+                      isDark ? AppColors.iconlight : AppColors.icondarkmode,
+                  child: Text(
+                    userData['name'] != null && userData['name'].isNotEmpty
+                        ? userData['name'][0].toUpperCase()
+                        : '?',
+                    style: const TextStyle(fontSize: 20, color: Colors.white),
                   ),
-                  leading: CircleAvatar(
-                    radius: 25,
-                    backgroundColor:
-                        isDark ? AppColors.iconlight : AppColors.icondarkmode,
-                    child: Text(
-                      userData['name'] != null && userData['name'].isNotEmpty
-                          ? userData['name'][0].toUpperCase()
-                          : '?',
-                      style: const TextStyle(fontSize: 20, color: Colors.white),
-                    ),
+                ),
+                title: Text(
+                  userData['name'] ?? 'No Name',
+                  style: TextStyle(
+                    color: isDark
+                        ? AppColors.textdarkmode
+                        : AppColors.textlightmode,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
                   ),
-                  title: Text(
-                    userData['name'] ?? 'No Name',
-                    style: TextStyle(
-                      color: isDark
-                          ? AppColors.textdarkmode
-                          : AppColors.textlightmode,
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  subtitle: Text(
-                    userData['email'] ?? '',
-                    style: TextStyle(
-                      color: isDark
-                          ? AppColors.hintdarkmode
-                          : AppColors.hintlightmode,
-                      fontSize: 14,
-                    ),
-                  ),
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => ChatScreen(
-                          currentUser: currentUser,
-                          otherUser: userData,
+                ),
+                subtitle: StreamBuilder<QuerySnapshot>(
+                  stream: FirebaseFirestore.instance
+                      .collection('chats')
+                      .doc(getChatId(currentUser.uid, userData['uid']))
+                      .collection('messages')
+                      .orderBy('timestamp', descending: true)
+                      .limit(1)
+                      .snapshots(),
+                  builder: (context, messageSnapshot) {
+                    if (!messageSnapshot.hasData ||
+                        messageSnapshot.data!.docs.isEmpty) {
+                      return Text(
+                        'No messages yet',
+                        style: TextStyle(
+                          color: isDark
+                              ? AppColors.hintdarkmode
+                              : AppColors.hintlightmode,
+                          fontSize: 14,
                         ),
+                      );
+                    }
+
+                    final lastMessage = messageSnapshot.data!.docs.first.data()
+                        as Map<String, dynamic>;
+
+                    return Text(
+                      lastMessage['message'] ?? '',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: isDark
+                            ? AppColors.hintdarkmode
+                            : AppColors.hintlightmode,
+                        fontSize: 14,
                       ),
                     );
-                  });
+                  },
+                ),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => ChatScreen(
+                        currentUser: currentUser,
+                        otherUser: userData,
+                      ),
+                    ),
+                  );
+                },
+              );
             },
           );
         },

@@ -66,14 +66,7 @@ class Onboardingscreen extends StatelessWidget {
             ? AppColors.scaffolddark
             : AppColors.scaffoldlight,
         elevation: 0,
-        actions: [
-          IconButton(
-            onPressed: () {
-              BlocProvider.of<Themecubit>(context).toggleTheme();
-            },
-            icon: const Icon(Icons.dark_mode),
-          )
-        ],
+        automaticallyImplyLeading: false,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.only(top: 30),

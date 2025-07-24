@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:messenger_app/repositary/screens/chats/chatscreen.dart';
+import 'package:messenger_app/repositary/screens/onboard/onboardingscreen.dart';
 import 'package:messenger_app/repositary/screens/widgets/Uihelper.dart';
 import '../../../domain/constants/appcolors.dart';
 
@@ -51,7 +52,7 @@ class _ContactscreenState extends State<Contactscreen> {
     final doc = await contactRef.get();
     if (!doc.exists) {
       await contactRef.set(user);
-      fetchContacts(); // Refresh list
+      fetchContacts();
     }
   }
 
@@ -84,6 +85,12 @@ class _ContactscreenState extends State<Contactscreen> {
 
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+            onPressed: () {
+              Navigator.pushReplacement(context,
+                  MaterialPageRoute(builder: (_) => Onboardingscreen()));
+            },
+            icon: Icon(Icons.arrow_back_ios_new)),
         backgroundColor:
             isDark ? AppColors.scaffolddark : AppColors.scaffoldlight,
         elevation: 0,
@@ -97,7 +104,7 @@ class _ContactscreenState extends State<Contactscreen> {
         actions: [
           IconButton(
             onPressed: () {},
-            icon: const Icon(Icons.add),
+            icon: const Icon(Icons.contact_page_outlined),
           ),
         ],
       ),
@@ -106,30 +113,6 @@ class _ContactscreenState extends State<Contactscreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Current User Info
-            ListTile(
-              leading: CircleAvatar(
-                backgroundImage: widget.currentUser.photoURL != null
-                    ? NetworkImage(widget.currentUser.photoURL!)
-                    : null,
-                child: widget.currentUser.photoURL == null
-                    ? const Icon(Icons.person, color: Colors.white)
-                    : null,
-                radius: 30,
-              ),
-              title: Text(
-                widget.currentUser.displayName ?? '',
-                style:
-                    const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
-              subtitle: Text(
-                widget.currentUser.email ?? '',
-                style: const TextStyle(fontSize: 13),
-              ),
-            ),
-            const SizedBox(height: 20),
-
-            // Search Field
             Uihelper.CustomTextField(
               controller: searchController,
               text: "Enter Phone Number",
@@ -147,7 +130,7 @@ class _ContactscreenState extends State<Contactscreen> {
                     )
                   : null,
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 10),
 
             // Search Result
             if (searchedUser != null)
