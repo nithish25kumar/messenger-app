@@ -85,14 +85,8 @@ class _ContactscreenState extends State<Contactscreen> {
 
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-            onPressed: () {
-              Navigator.pushReplacement(context,
-                  MaterialPageRoute(builder: (_) => Onboardingscreen()));
-            },
-            icon: Icon(Icons.arrow_back_ios_new)),
-        backgroundColor:
-            isDark ? AppColors.scaffolddark : AppColors.scaffoldlight,
+        automaticallyImplyLeading: false,
+        backgroundColor: Colors.white,
         elevation: 0,
         title: Uihelper.CustomText(
           text: "Contacts",
@@ -132,7 +126,6 @@ class _ContactscreenState extends State<Contactscreen> {
             ),
             const SizedBox(height: 10),
 
-            // Search Result
             if (searchedUser != null)
               ListTile(
                 leading: CircleAvatar(

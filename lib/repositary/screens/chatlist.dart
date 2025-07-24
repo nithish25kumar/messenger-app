@@ -18,11 +18,9 @@ class ChatListScreen extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor:
-          isDark ? AppColors.scaffolddark : AppColors.scaffoldlight,
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor:
-            isDark ? AppColors.scaffolddark : AppColors.scaffoldlight,
+        backgroundColor: Colors.white,
         title: const Text(
           'My Chats',
           style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
@@ -52,9 +50,7 @@ class ChatListScreen extends StatelessWidget {
               return ListTile(
                 contentPadding:
                     const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                tileColor: isDark
-                    ? AppColors.containerdarkmode.withOpacity(0.4)
-                    : AppColors.containerlightmode,
+                tileColor: Colors.lightGreenAccent,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),

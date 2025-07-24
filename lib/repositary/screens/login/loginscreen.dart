@@ -25,7 +25,7 @@ class _LoginscreenState extends State<Loginscreen> {
     try {
       final GoogleSignIn googleSignIn = GoogleSignIn();
 
-      await googleSignIn.signOut(); // Force account picker
+      await googleSignIn.signOut();
       final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
       if (googleUser == null) {
         setState(() => isLoading = false);
@@ -57,7 +57,6 @@ class _LoginscreenState extends State<Loginscreen> {
         return;
       }
 
-      // 🔒 Check if phone number is already used by another user
       final phoneQuery = await _firestore
           .collection("users")
           .where("phone", isEqualTo: phoneNumber)
@@ -70,7 +69,6 @@ class _LoginscreenState extends State<Loginscreen> {
         return;
       }
 
-      // 🔒 Check if email is already registered (optional if Firebase Auth handles it)
       final existingDoc =
           await _firestore.collection("users").doc(user.uid).get();
       if (existingDoc.exists) {
@@ -80,7 +78,6 @@ class _LoginscreenState extends State<Loginscreen> {
         return;
       }
 
-      // ✅ Save new user
       await _firestore.collection("users").doc(user.uid).set({
         "uid": user.uid,
         "email": user.email,

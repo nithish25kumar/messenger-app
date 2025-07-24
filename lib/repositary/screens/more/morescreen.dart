@@ -1,6 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:messenger_app/repositary/screens/AccountScreen/AccountScreen.dart';
+import 'package:messenger_app/repositary/screens/CreatorInfoScreen/CreatorInfoScreen.dart';
+import 'package:messenger_app/repositary/screens/InviteFriendsScreen/InviteFriendsScreen.dart';
+import 'package:messenger_app/repositary/screens/NotificationsScreen/NotificationsScreen.dart';
+import 'package:messenger_app/repositary/screens/PrivacyScreen/PrivacyScreen.dart';
 import 'package:messenger_app/repositary/screens/onboard/onboardingscreen.dart';
 import 'package:messenger_app/repositary/screens/widgets/Uihelper.dart';
 
@@ -16,12 +21,9 @@ class Morescreen extends StatefulWidget {
 class _MorescreenState extends State<Morescreen> {
   final List<Map<String, dynamic>> arrMore = [
     {"icon": Icons.person, "txt": "Account"},
-    {"icon": Icons.chat_sharp, "txt": "Chats"},
-    {"icon": Icons.sunny, "txt": "Appearance"},
+    {"icon": Icons.developer_board, "txt": "Creator Info"},
     {"icon": Icons.notifications_active, "txt": "Notifications"},
     {"icon": Icons.privacy_tip, "txt": "Privacy"},
-    {"icon": Icons.folder, "txt": "Data Usage"},
-    {"icon": Icons.help, "txt": "Help"},
     {"icon": Icons.mail, "txt": "Invite Your Friends"},
   ];
 
@@ -106,7 +108,38 @@ class _MorescreenState extends State<Morescreen> {
                     final item = arrMore[index];
                     return InkWell(
                       onTap: () {
-                        // TODO: Add navigation for each option
+                        switch (index) {
+                          case 0:
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (_) => Accountscreen()));
+                            break;
+                          case 1:
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (_) => Creatorinfoscreen()));
+                            break;
+                          case 2:
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (_) => Notificationsscreen()));
+                            break;
+                          case 3:
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (_) => Privacyscreen()));
+                            break;
+                          case 4:
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (_) => Invitefriendsscreen()));
+                            break;
+                        }
                       },
                       child: ListTile(
                         leading: Icon(item["icon"] as IconData),

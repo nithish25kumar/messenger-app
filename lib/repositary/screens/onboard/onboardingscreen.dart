@@ -1,24 +1,22 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:messenger_app/domain/constants/appcolors.dart';
-import 'package:messenger_app/domain/constants/cubits/themecubit.dart';
 import 'package:messenger_app/repositary/screens/bottomnav/bottomNavscreen.dart';
 import 'package:messenger_app/repositary/screens/login/loginscreen.dart';
 import 'package:messenger_app/repositary/screens/widgets/Uihelper.dart';
 
 class Onboardingscreen extends StatelessWidget {
   const Onboardingscreen({super.key});
+
   Future<void> _signInWithGoogle(BuildContext context) async {
     try {
-      // 🔁 Sign out from previous sessions to force account picker
       await GoogleSignIn().signOut();
       await FirebaseAuth.instance.signOut();
 
       final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
-      if (googleUser == null) return; // User cancelled sign-in
+      if (googleUser == null) return;
 
       final GoogleSignInAuthentication googleAuth =
           await googleUser.authentication;
@@ -28,7 +26,6 @@ class Onboardingscreen extends StatelessWidget {
         idToken: googleAuth.idToken,
       );
 
-      // Temporary sign-in to get UID
       UserCredential result =
           await FirebaseAuth.instance.signInWithCredential(credential);
       final User? user = result.user;
@@ -41,13 +38,11 @@ class Onboardingscreen extends StatelessWidget {
             await FirebaseFirestore.instance.collection('users').doc(uid).get();
 
         if (userDoc.exists) {
-          // ✅ User exists → go to home screen
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (_) => const Bottomnavscreen()),
           );
         } else {
-          // ❌ User doesn't exist → show message and sign out
           await FirebaseAuth.instance.signOut();
           await GoogleSignIn().signOut();
           Uihelper.showSnackBar(context, "No account found for ${email}");
@@ -62,27 +57,39 @@ class Onboardingscreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).brightness == Brightness.dark
-            ? AppColors.scaffolddark
-            : AppColors.scaffoldlight,
+        backgroundColor: Colors.white,
         elevation: 0,
+        title: Uihelper.CustomText(
+            text: "Zynk-Messenger",
+            fontsize: 25,
+            fontweight: FontWeight.bold,
+            fontfamily: "bold",
+            context: context),
         automaticallyImplyLeading: false,
+        centerTitle: true,
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.only(top: 30),
         child: Center(
           child: Column(
             children: [
-              Uihelper.CustomImage(imgurl: "onboarding.png"),
-              const SizedBox(height: 50),
-              Uihelper.CustomText(
-                text:
-                    "Connect easily with \n your family and friends\n over countries",
-                fontsize: 25,
-                fontweight: FontWeight.bold,
-                context: context,
+              SizedBox(
+                height: 40,
               ),
-              const SizedBox(height: 60),
+              Uihelper.CustomImage(imgurl: "intro.png"),
+              const SizedBox(height: 90),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Uihelper.CustomText(
+                    text:
+                        "Vibe, chat, repeat.\nStay close, no matter the coast 🌍",
+                    fontsize: 22,
+                    fontweight: FontWeight.bold,
+                    context: context,
+                  ),
+                ],
+              ),
+              const SizedBox(height: 170),
               Uihelper.CustomButton(
                 buttonnname: "Start Messaging",
                 callback: () {
@@ -101,7 +108,7 @@ class Onboardingscreen extends StatelessWidget {
                   }
                 },
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 10),
               Uihelper.CustomButton(
                 buttonnname: "Login with Google",
                 callback: () => _signInWithGoogle(context),

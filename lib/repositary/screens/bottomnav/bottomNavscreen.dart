@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:messenger_app/repositary/screens/chats/chatscreen.dart';
 import 'package:messenger_app/repositary/screens/contacts/contactscreen.dart';
 import 'package:messenger_app/repositary/screens/more/morescreen.dart';
-import '../../../domain/constants/appcolors.dart';
 import '../chatlist.dart';
 
 class Bottomnavscreen extends StatefulWidget {
@@ -53,16 +51,9 @@ class _BottomnavscreenState extends State<Bottomnavscreen> {
             currentIndex = value;
           });
         },
-        showSelectedLabels: false,
+        showSelectedLabels: true,
         showUnselectedLabels: false,
-        backgroundColor: Theme.of(context).brightness == Brightness.dark
-            ? AppColors.bottomdark
-            : AppColors.bottomlight,
-        selectedIconTheme: IconThemeData(
-          color: Theme.of(context).brightness == Brightness.dark
-              ? AppColors.icondarkmode
-              : AppColors.iconlightmode,
-        ),
+        backgroundColor: Colors.white,
       ),
       body: IndexedStack(
         index: currentIndex,
