@@ -1,42 +1,91 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:messenger_app/repositary/screens/chats/chatscreen.dart';
 import 'package:messenger_app/repositary/screens/widgets/Uihelper.dart';
 import '../../../domain/constants/appcolors.dart';
 
-class Contactscreen extends StatelessWidget {
+class Contactscreen extends StatefulWidget {
   final User currentUser;
-  Contactscreen({required this.currentUser});
 
-  TextEditingController searchController = TextEditingController();
+  const Contactscreen({super.key, required this.currentUser});
 
-  var arrContacts = [
-    {
-      "img": "Frame 3293.png",
-      "name": "Athalia Putri",
-      "lastseen": "Last seen yesterday"
-    },
-    {"img": "Avatar.png", "name": "Erlan Sadewa", "lastseen": "Online"},
-    {
-      "img": "Avatar (1).png",
-      "name": "Midala Huera",
-      "lastseen": "Last seen 3 hours ago"
-    },
-    {"img": "Avatar (2).png", "name": "Nafisa Gitari", "lastseen": "Online"},
-    {"img": "Frame 3293 (1).png", "name": "Raki Devon", "lastseen": "Online"},
-    {
-      "img": "Avatar (3).png",
-      "name": "Salsabila Akira",
-      "lastseen": "Last seen 30 minutes ago"
-    },
-  ];
+  @override
+  State<Contactscreen> createState() => _ContactscreenState();
+}
+
+class _ContactscreenState extends State<Contactscreen> {
+  final TextEditingController searchController = TextEditingController();
+  Map<String, dynamic>? searchedUser;
+  List<Map<String, dynamic>> contactList = [];
+
+  @override
+  void initState() {
+    super.initState();
+    fetchContacts();
+  }
+
+  void fetchContacts() async {
+    final contactsSnapshot = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(widget.currentUser.uid)
+        .collection('contacts')
+        .get();
+
+    final contacts = contactsSnapshot.docs
+        .map((doc) => doc.data() as Map<String, dynamic>)
+        .toList();
+
+    setState(() {
+      contactList = contacts;
+    });
+  }
+
+  void addToContacts(Map<String, dynamic> user) async {
+    final contactRef = FirebaseFirestore.instance
+        .collection('users')
+        .doc(widget.currentUser.uid)
+        .collection('contacts')
+        .doc(user['uid']);
+
+    final doc = await contactRef.get();
+    if (!doc.exists) {
+      await contactRef.set(user);
+      fetchContacts(); // Refresh list
+    }
+  }
+
+  void searchByPhoneNumber(String phone) async {
+    if (phone.isEmpty) {
+      setState(() => searchedUser = null);
+      return;
+    }
+
+    final querySnapshot = await FirebaseFirestore.instance
+        .collection('users')
+        .where('phone', isEqualTo: phone)
+        .get();
+
+    if (querySnapshot.docs.isNotEmpty) {
+      final userData = querySnapshot.docs.first.data();
+      if (userData['uid'] != widget.currentUser.uid) {
+        setState(() => searchedUser = userData);
+      } else {
+        setState(() => searchedUser = null); // avoid showing self
+      }
+    } else {
+      setState(() => searchedUser = null);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).brightness == Brightness.dark
-            ? AppColors.scaffolddark
-            : AppColors.scaffoldlight,
+        backgroundColor:
+            isDark ? AppColors.scaffolddark : AppColors.scaffoldlight,
         elevation: 0,
         title: Uihelper.CustomText(
           text: "Contacts",
@@ -45,54 +94,138 @@ class Contactscreen extends StatelessWidget {
           fontfamily: "bold",
           context: context,
         ),
-        actions: [IconButton(onPressed: () {}, icon: Icon(Icons.add))],
+        actions: [
+          IconButton(
+            onPressed: () {},
+            icon: const Icon(Icons.add),
+          ),
+        ],
       ),
-      body: Center(
+      body: Padding(
+        padding: const EdgeInsets.all(12.0),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(height: 20),
+            // Current User
             ListTile(
               leading: CircleAvatar(
-                backgroundImage: NetworkImage(currentUser.photoURL ?? ''),
+                backgroundImage: widget.currentUser.photoURL != null
+                    ? NetworkImage(widget.currentUser.photoURL!)
+                    : null,
+                child: widget.currentUser.photoURL == null
+                    ? const Icon(Icons.person, color: Colors.white)
+                    : null,
                 radius: 30,
               ),
               title: Text(
-                currentUser.displayName ?? '',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                widget.currentUser.displayName ?? '',
+                style:
+                    const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
-              subtitle:
-                  Text(currentUser.email ?? '', style: TextStyle(fontSize: 13)),
+              subtitle: Text(
+                widget.currentUser.email ?? '',
+                style: const TextStyle(fontSize: 13),
+              ),
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 20),
+
+            // Search Field
             Uihelper.CustomTextField(
               controller: searchController,
-              text: "Search",
-              textinputtype: TextInputType.text,
+              text: "Enter Phone Number",
+              textinputtype: TextInputType.phone,
               context: context,
               icondata: Icons.search,
+              onChanged: (value) => searchByPhoneNumber(value.trim()),
+              suffixIcon: searchController.text.isNotEmpty
+                  ? IconButton(
+                      icon: const Icon(Icons.clear),
+                      onPressed: () {
+                        searchController.clear();
+                        setState(() => searchedUser = null);
+                      },
+                    )
+                  : null,
             ),
-            SizedBox(height: 10),
-            Expanded(
-              child: ListView.builder(
-                itemCount: arrContacts.length,
-                itemBuilder: (context, index) {
-                  return ListTile(
-                    leading: Uihelper.CustomImage(
-                        imgurl: arrContacts[index]["img"].toString()),
-                    title: Uihelper.CustomText(
-                      text: arrContacts[index]["name"].toString(),
-                      fontsize: 14,
-                      fontweight: FontWeight.w600,
-                      context: context,
-                    ),
-                    subtitle: Uihelper.CustomText(
-                      text: arrContacts[index]["lastseen"].toString(),
-                      fontsize: 12,
-                      context: context,
+            const SizedBox(height: 20),
+
+            // Search Result
+            if (searchedUser != null)
+              ListTile(
+                leading: CircleAvatar(
+                  backgroundImage: searchedUser!['photoUrl'] != null
+                      ? NetworkImage(searchedUser!['photoUrl'])
+                      : null,
+                  child: searchedUser!['photoUrl'] == null
+                      ? const Icon(Icons.person, color: Colors.white)
+                      : null,
+                  radius: 25,
+                ),
+                title: Text(searchedUser!['name'] ?? ''),
+                subtitle: Text(searchedUser!['phone'] ?? ''),
+                onTap: () {
+                  addToContacts(searchedUser!);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => Chatscreen(
+                        currentUser: widget.currentUser,
+                        otherUser: searchedUser!,
+                      ),
                     ),
                   );
                 },
+              )
+            else if (searchController.text.isNotEmpty)
+              const Padding(
+                padding: EdgeInsets.only(top: 10),
+                child:
+                    Text("No user found", style: TextStyle(color: Colors.grey)),
               ),
+
+            const SizedBox(height: 20),
+            Uihelper.CustomText(
+              text: "Your Contacts",
+              fontsize: 18,
+              fontweight: FontWeight.bold,
+              context: context,
+            ),
+            const SizedBox(height: 10),
+
+            // Contact List
+            Expanded(
+              child: contactList.isEmpty
+                  ? const Text("No contacts yet",
+                      style: TextStyle(color: Colors.grey))
+                  : ListView.builder(
+                      itemCount: contactList.length,
+                      itemBuilder: (context, index) {
+                        final user = contactList[index];
+                        return ListTile(
+                          leading: CircleAvatar(
+                            backgroundImage: user['photoUrl'] != null
+                                ? NetworkImage(user['photoUrl'])
+                                : null,
+                            child: user['photoUrl'] == null
+                                ? const Icon(Icons.person, color: Colors.white)
+                                : null,
+                          ),
+                          title: Text(user['name'] ?? ''),
+                          subtitle: Text(user['phone'] ?? ''),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => Chatscreen(
+                                  currentUser: widget.currentUser,
+                                  otherUser: user,
+                                ),
+                              ),
+                            );
+                          },
+                        );
+                      },
+                    ),
             ),
           ],
         ),

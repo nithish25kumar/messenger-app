@@ -22,7 +22,10 @@ class _LoginscreenState extends State<Loginscreen> {
   Future<void> handleGoogleSignIn() async {
     setState(() => isLoading = true);
     try {
-      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+      final GoogleSignIn googleSignIn = GoogleSignIn();
+
+      await googleSignIn.signOut(); // Force account picker
+      final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
       if (googleUser == null) {
         setState(() => isLoading = false);
         return;
@@ -32,12 +35,14 @@ class _LoginscreenState extends State<Loginscreen> {
           await googleUser.authentication;
 
       final AuthCredential credential = GoogleAuthProvider.credential(
-          accessToken: googleAuth.accessToken, idToken: googleAuth.idToken);
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
 
       final UserCredential userCredential =
           await _auth.signInWithCredential(credential);
-
       final User? user = userCredential.user;
+
       if (user == null) {
         Uihelper.showSnackBar(context, "Google sign-in failed");
         setState(() => isLoading = false);
@@ -51,6 +56,30 @@ class _LoginscreenState extends State<Loginscreen> {
         return;
       }
 
+      // 🔒 Check if phone number is already used by another user
+      final phoneQuery = await _firestore
+          .collection("users")
+          .where("phone", isEqualTo: phoneNumber)
+          .get();
+
+      if (phoneQuery.docs.isNotEmpty && phoneQuery.docs.first.id != user.uid) {
+        Uihelper.showSnackBar(
+            context, "Phone number is already linked with another account");
+        setState(() => isLoading = false);
+        return;
+      }
+
+      // 🔒 Check if email is already registered (optional if Firebase Auth handles it)
+      final existingDoc =
+          await _firestore.collection("users").doc(user.uid).get();
+      if (existingDoc.exists) {
+        Uihelper.showSnackBar(context,
+            "Email is already linked. Please use a different Google account.");
+        setState(() => isLoading = false);
+        return;
+      }
+
+      // ✅ Save new user
       await _firestore.collection("users").doc(user.uid).set({
         "uid": user.uid,
         "email": user.email,
@@ -100,6 +129,7 @@ class _LoginscreenState extends State<Loginscreen> {
                   textinputtype: TextInputType.phone,
                   context: context,
                   icondata: Icons.phone,
+                  onChanged: (value) {},
                 ),
                 SizedBox(height: 40),
               ],

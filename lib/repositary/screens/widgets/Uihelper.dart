@@ -1,75 +1,84 @@
 import 'package:flutter/material.dart';
-
 import '../../../domain/constants/appcolors.dart';
 
 class Uihelper {
-  static CustomImage({required String imgurl}) {
+  static Widget CustomImage({required String imgurl}) {
     return Image.asset("assets/images/$imgurl");
   }
 
-  static CustomText(
-      {required String text,
-      required double fontsize,
-      String? fontfamily,
-      FontWeight? fontweight,
-      Color? color,
-      required BuildContext context}) {
+  static Widget CustomText({
+    required String text,
+    required double fontsize,
+    String? fontfamily,
+    FontWeight? fontweight,
+    Color? color,
+    required BuildContext context,
+  }) {
     return Text(
       text,
       style: TextStyle(
-          fontSize: fontsize,
-          fontFamily: fontfamily ?? "regular",
-          color: color ??
-              (Theme.of(context).brightness == Brightness.dark
-                  ? AppColors.textdarkmode
-                  : AppColors.textlightmode),
-          fontWeight: fontweight ?? FontWeight.normal),
+        fontSize: fontsize,
+        fontFamily: fontfamily ?? "regular",
+        fontWeight: fontweight ?? FontWeight.normal,
+        color: color ??
+            (Theme.of(context).brightness == Brightness.dark
+                ? AppColors.textdarkmode
+                : AppColors.textlightmode),
+      ),
     );
   }
 
-  static CustomButton(
-      {required String buttonnname,
-      required VoidCallback callback,
-      Color? buttoncolor}) {
+  static Widget CustomButton({
+    required String buttonnname,
+    required VoidCallback callback,
+    Color? buttoncolor,
+  }) {
     return SizedBox(
       height: 45,
       width: 350,
       child: ElevatedButton(
-          onPressed: () {
-            callback();
-          },
-          style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.buttonlightmode,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(0))),
-          child: Text(
-            buttonnname,
-            style: TextStyle(
-                fontSize: 16,
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontFamily: "bold"),
-          )),
+        onPressed: callback,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: buttoncolor ?? AppColors.buttonlightmode,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+        ),
+        child: Text(
+          buttonnname,
+          style: const TextStyle(
+            fontSize: 16,
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontFamily: "bold",
+          ),
+        ),
+      ),
     );
   }
 
-  static CustomTextField(
-      {required TextEditingController controller,
-      required String text,
-      required TextInputType textinputtype,
-      required BuildContext context,
-      required IconData icondata}) {
+  static Widget CustomTextField({
+    required TextEditingController controller,
+    required String text,
+    required TextInputType textinputtype,
+    required BuildContext context,
+    required IconData icondata,
+    required Function(String) onChanged,
+    IconButton? suffixIcon,
+  }) {
     return Container(
       height: 45,
       width: 330,
       decoration: BoxDecoration(
-          color: Theme.of(context).brightness == Brightness.dark
-              ? AppColors.containerdarkmode
-              : AppColors.containerlightmode,
-          borderRadius: BorderRadius.circular(0)),
+        color: Theme.of(context).brightness == Brightness.dark
+            ? AppColors.containerdarkmode
+            : AppColors.containerlightmode,
+        borderRadius: BorderRadius.circular(8),
+      ),
       child: TextField(
         controller: controller,
         keyboardType: textinputtype,
+        onChanged: onChanged,
         style: TextStyle(
           color: Theme.of(context).brightness == Brightness.dark
               ? AppColors.textdarkmode
