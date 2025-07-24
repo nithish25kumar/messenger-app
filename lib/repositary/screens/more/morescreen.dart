@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:messenger_app/repositary/screens/onboard/onboardingscreen.dart';
 import 'package:messenger_app/repositary/screens/widgets/Uihelper.dart';
 
 import '../../../domain/constants/appcolors.dart';
@@ -121,6 +122,25 @@ class _MorescreenState extends State<Morescreen> {
                   },
                 ),
               ),
+              SizedBox(height: 10),
+              ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red,
+                  foregroundColor: Colors.white,
+                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+                icon: Icon(Icons.logout),
+                label: Text("Logout"),
+                onPressed: () async {
+                  await FirebaseAuth.instance.signOut();
+                  Navigator.pushReplacement(context,
+                      MaterialPageRoute(builder: (_) => Onboardingscreen()));
+                },
+              ),
+              SizedBox(height: 20),
             ],
           ),
         ),

@@ -6,6 +6,7 @@ import 'package:messenger_app/repositary/screens/bottomnav/bottomNavscreen.dart'
 
 import 'package:messenger_app/repositary/screens/widgets/Uihelper.dart';
 import '../../../domain/constants/appcolors.dart';
+import '../onboard/onboardingscreen.dart';
 
 class Loginscreen extends StatefulWidget {
   @override
@@ -108,7 +109,8 @@ class _LoginscreenState extends State<Loginscreen> {
         elevation: 0,
         leading: IconButton(
           icon: Icon(Icons.arrow_back_ios_new),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => Navigator.pushReplacement(
+              context, MaterialPageRoute(builder: (_) => Onboardingscreen())),
         ),
       ),
       body: Padding(
