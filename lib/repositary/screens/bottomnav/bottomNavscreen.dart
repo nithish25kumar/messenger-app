@@ -14,7 +14,7 @@ class Bottomnavscreen extends StatefulWidget {
 }
 
 class _BottomnavscreenState extends State<Bottomnavscreen> {
-  int currentIndex = 1;
+  int currentIndex = 0;
   late List<Widget> pages;
   late User currentUser;
 
