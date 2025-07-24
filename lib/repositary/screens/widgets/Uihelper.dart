@@ -6,6 +6,36 @@ class Uihelper {
     return Image.asset("assets/images/$imgurl");
   }
 
+  static Widget CustomSendButton({
+    required BuildContext context,
+    required VoidCallback onPressed,
+    double height = 50,
+    double width = 70,
+    String text = "Send",
+  }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return Container(
+      height: height,
+      width: width,
+      decoration: BoxDecoration(
+        color: isDark ? AppColors.scaffolddark : AppColors.scaffoldlight,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: MaterialButton(
+        onPressed: onPressed,
+        child: Text(
+          text,
+          style: TextStyle(
+            color: isDark ? Colors.white : Colors.black,
+            fontWeight: FontWeight.bold,
+            fontSize: 14,
+          ),
+        ),
+      ),
+    );
+  }
+
   static Widget CustomText({
     required String text,
     required double fontsize,
@@ -52,6 +82,39 @@ class Uihelper {
             fontWeight: FontWeight.bold,
             fontFamily: "bold",
           ),
+        ),
+      ),
+    );
+  }
+
+  static Widget CustomMessageTextField({
+    required TextEditingController controller,
+    required BuildContext context,
+    String hintText = "Type a message...",
+    IconData icon = Icons.message,
+  }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return Container(
+      decoration: BoxDecoration(
+        color:
+            isDark ? AppColors.containerdarkmode : AppColors.containerlightmode,
+        borderRadius: BorderRadius.circular(0),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 25),
+      child: TextField(
+        controller: controller,
+        style: TextStyle(
+          color: isDark ? AppColors.textdarkmode : AppColors.textlightmode,
+        ),
+        decoration: InputDecoration(
+          hintText: hintText,
+          hintStyle: TextStyle(
+            color: isDark ? AppColors.hintdarkmode : AppColors.hintlightmode,
+          ),
+          border: InputBorder.none,
+          icon: Icon(icon,
+              color: isDark ? AppColors.iconlight : AppColors.icondarkmode),
         ),
       ),
     );

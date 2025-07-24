@@ -46,56 +46,55 @@ class ChatListScreen extends StatelessWidget {
               final userData = doc.data() as Map<String, dynamic>;
 
               return ListTile(
-                contentPadding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                tileColor: isDark
-                    ? AppColors.containerdarkmode.withOpacity(0.4)
-                    : AppColors.containerlightmode,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                leading: CircleAvatar(
-                  radius: 25,
-                  backgroundColor:
-                      isDark ? AppColors.iconlight : AppColors.icondarkmode,
-                  child: Text(
-                    userData['name'] != null && userData['name'].isNotEmpty
-                        ? userData['name'][0].toUpperCase()
-                        : '?',
-                    style: const TextStyle(fontSize: 20, color: Colors.white),
+                  contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  tileColor: isDark
+                      ? AppColors.containerdarkmode.withOpacity(0.4)
+                      : AppColors.containerlightmode,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
                   ),
-                ),
-                title: Text(
-                  userData['name'] ?? 'No Name',
-                  style: TextStyle(
-                    color: isDark
-                        ? AppColors.textdarkmode
-                        : AppColors.textlightmode,
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                subtitle: Text(
-                  userData['email'] ?? '',
-                  style: TextStyle(
-                    color: isDark
-                        ? AppColors.hintdarkmode
-                        : AppColors.hintlightmode,
-                    fontSize: 14,
-                  ),
-                ),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => Chatscreen(
-                        currentUser: currentUser,
-                        otherUser: userData,
-                      ),
+                  leading: CircleAvatar(
+                    radius: 25,
+                    backgroundColor:
+                        isDark ? AppColors.iconlight : AppColors.icondarkmode,
+                    child: Text(
+                      userData['name'] != null && userData['name'].isNotEmpty
+                          ? userData['name'][0].toUpperCase()
+                          : '?',
+                      style: const TextStyle(fontSize: 20, color: Colors.white),
                     ),
-                  );
-                },
-              );
+                  ),
+                  title: Text(
+                    userData['name'] ?? 'No Name',
+                    style: TextStyle(
+                      color: isDark
+                          ? AppColors.textdarkmode
+                          : AppColors.textlightmode,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  subtitle: Text(
+                    userData['email'] ?? '',
+                    style: TextStyle(
+                      color: isDark
+                          ? AppColors.hintdarkmode
+                          : AppColors.hintlightmode,
+                      fontSize: 14,
+                    ),
+                  ),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => ChatScreen(
+                          currentUser: currentUser,
+                          otherUser: userData,
+                        ),
+                      ),
+                    );
+                  });
             },
           );
         },

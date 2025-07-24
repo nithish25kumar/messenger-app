@@ -1,37 +1,35 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:messenger_app/repositary/screens/widgets/Uihelper.dart';
 import '../../../domain/constants/appcolors.dart';
-import '../widgets/Uihelper.dart';
 
-class Chatscreen extends StatefulWidget {
+class ChatScreen extends StatefulWidget {
   final User currentUser;
   final Map<String, dynamic> otherUser;
 
-  const Chatscreen({
+  const ChatScreen({
     super.key,
     required this.currentUser,
     required this.otherUser,
   });
 
   @override
-  State<Chatscreen> createState() => _ChatscreenState();
+  State<ChatScreen> createState() => _ChatScreenState();
 }
 
-class _ChatscreenState extends State<Chatscreen> {
-  final TextEditingController messageController = TextEditingController();
+class _ChatScreenState extends State<ChatScreen> {
+  final TextEditingController _messageController = TextEditingController();
 
-  String getChatId() {
-    final uid1 = widget.currentUser.uid;
-    final uid2 = widget.otherUser['uid'];
-    return uid1.compareTo(uid2) < 0 ? '$uid1\_$uid2' : '$uid2\_$uid1';
+  String getChatId(String uid1, String uid2) {
+    return uid1.hashCode <= uid2.hashCode ? '$uid1\_$uid2' : '$uid2\_$uid1';
   }
 
   void sendMessage() async {
-    final text = messageController.text.trim();
-    if (text.isEmpty) return;
+    final message = _messageController.text.trim();
+    if (message.isEmpty) return;
 
-    final chatId = getChatId();
+    final chatId = getChatId(widget.currentUser.uid, widget.otherUser['uid']);
 
     await FirebaseFirestore.instance
         .collection('chats')
@@ -40,89 +38,119 @@ class _ChatscreenState extends State<Chatscreen> {
         .add({
       'senderId': widget.currentUser.uid,
       'receiverId': widget.otherUser['uid'],
-      'text': text,
+      'message': message,
       'timestamp': FieldValue.serverTimestamp(),
     });
 
-    messageController.clear();
+    _messageController.clear();
+  }
+
+  String formatTimestamp(Timestamp timestamp) {
+    final dateTime = timestamp.toDate();
+    return "${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}";
   }
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final chatId = getChatId();
+    final chatId = getChatId(widget.currentUser.uid, widget.otherUser['uid']);
 
     return Scaffold(
-      backgroundColor:
-          isDark ? AppColors.scaffolddark : AppColors.scaffoldlight,
       appBar: AppBar(
-        backgroundColor:
-            isDark ? AppColors.scaffolddark : AppColors.scaffoldlight,
+        backgroundColor: AppColors.buttonlightmode,
         title: Row(
           children: [
             CircleAvatar(
+              radius: 20,
               backgroundImage: widget.otherUser['photoUrl'] != null
                   ? NetworkImage(widget.otherUser['photoUrl'])
                   : null,
+              backgroundColor: Colors.grey[300],
               child: widget.otherUser['photoUrl'] == null
-                  ? const Icon(Icons.person, color: Colors.white)
+                  ? const Icon(Icons.person, color: Colors.black)
                   : null,
             ),
             const SizedBox(width: 10),
-            Uihelper.CustomText(
-              text: widget.otherUser['name'] ?? '',
-              fontsize: 18,
-              fontweight: FontWeight.bold,
-              context: context,
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  widget.otherUser['name'] ?? 'Unknown',
+                  style: const TextStyle(
+                      fontSize: 16, fontWeight: FontWeight.w600),
+                ),
+                if (widget.otherUser['email'] != null)
+                  Text(
+                    widget.otherUser['email'],
+                    style: const TextStyle(fontSize: 12, color: Colors.black54),
+                  ),
+              ],
             ),
           ],
         ),
       ),
       body: Column(
         children: [
-          // 🟩 Chat Messages Stream
           Expanded(
             child: StreamBuilder<QuerySnapshot>(
               stream: FirebaseFirestore.instance
                   .collection('chats')
                   .doc(chatId)
                   .collection('messages')
-                  .orderBy('timestamp', descending: true)
+                  .orderBy('timestamp', descending: false)
                   .snapshots(),
               builder: (context, snapshot) {
-                if (!snapshot.hasData) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());
                 }
 
-                final messages = snapshot.data!.docs;
+                final messages = snapshot.data?.docs ?? [];
+
+                if (messages.isEmpty) {
+                  return const Center(child: Text("No messages yet"));
+                }
 
                 return ListView.builder(
-                  reverse: true,
+                  padding: const EdgeInsets.all(10),
                   itemCount: messages.length,
                   itemBuilder: (context, index) {
-                    final msg = messages[index];
-                    final isMe = msg['senderId'] == widget.currentUser.uid;
+                    final data = messages[index].data() as Map<String, dynamic>;
+
+                    final isMe = data['senderId'] == widget.currentUser.uid;
 
                     return Align(
                       alignment:
                           isMe ? Alignment.centerRight : Alignment.centerLeft,
                       child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 14, vertical: 10),
-                        margin: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 4),
+                        margin: const EdgeInsets.symmetric(vertical: 4),
+                        padding: const EdgeInsets.all(10),
+                        constraints: const BoxConstraints(maxWidth: 250),
                         decoration: BoxDecoration(
                           color: isMe
-                              ? Colors.blueAccent
-                              : Colors.grey.shade800, // darker for receiver
-                          borderRadius: BorderRadius.circular(12),
+                              ? AppColors.buttonlightmode.withOpacity(0.85)
+                              : AppColors.containerlightmode,
+                          borderRadius: BorderRadius.circular(10),
                         ),
-                        child: Uihelper.CustomText(
-                          text: msg['text'] ?? '',
-                          fontsize: 14,
-                          fontweight: FontWeight.w500,
-                          context: context,
-                          color: Colors.white, // white text for all messages
+                        child: Column(
+                          crossAxisAlignment: isMe
+                              ? CrossAxisAlignment.end
+                              : CrossAxisAlignment.start,
+                          children: [
+                            Uihelper.CustomText(
+                              text: data['message'] ?? '',
+                              fontsize: 15,
+                              context: context,
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              data['timestamp'] != null
+                                  ? formatTimestamp(data['timestamp'])
+                                  : '',
+                              style: TextStyle(
+                                fontSize: 11,
+                                color: Colors.grey[600],
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     );
@@ -131,50 +159,22 @@ class _ChatscreenState extends State<Chatscreen> {
               },
             ),
           ),
-
           const Divider(height: 1),
-
-          // 🟩 Message Input Area
-          Padding(
+          Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+            color: Colors.white,
             child: Row(
               children: [
                 Expanded(
-                  child: Container(
-                    height: 45,
-                    decoration: BoxDecoration(
-                      color: isDark
-                          ? AppColors.containerdarkmode
-                          : AppColors.containerlightmode,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: TextField(
-                      controller: messageController,
-                      style: TextStyle(
-                        color: isDark
-                            ? AppColors.textdarkmode
-                            : AppColors.textlightmode,
-                      ),
-                      decoration: InputDecoration(
-                        hintText: "Type your message...",
-                        hintStyle: TextStyle(
-                          color: isDark
-                              ? AppColors.hintdarkmode
-                              : AppColors.hintlightmode,
-                          fontSize: 14,
-                        ),
-                        border: InputBorder.none,
-                        contentPadding:
-                            const EdgeInsets.symmetric(horizontal: 10),
-                      ),
-                    ),
+                  child: Uihelper.CustomMessageTextField(
+                    controller: _messageController,
+                    context: context,
                   ),
                 ),
-                const SizedBox(width: 10),
-                IconButton(
+                const SizedBox(width: 8),
+                Uihelper.CustomSendButton(
+                  context: context,
                   onPressed: sendMessage,
-                  icon: const Icon(Icons.send),
-                  color: Colors.blue,
                 ),
               ],
             ),

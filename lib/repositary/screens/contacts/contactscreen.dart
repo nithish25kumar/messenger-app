@@ -106,7 +106,7 @@ class _ContactscreenState extends State<Contactscreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Current User
+            // Current User Info
             ListTile(
               leading: CircleAvatar(
                 backgroundImage: widget.currentUser.photoURL != null
@@ -168,7 +168,7 @@ class _ContactscreenState extends State<Contactscreen> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => Chatscreen(
+                      builder: (_) => ChatScreen(
                         currentUser: widget.currentUser,
                         otherUser: searchedUser!,
                       ),
@@ -216,7 +216,7 @@ class _ContactscreenState extends State<Contactscreen> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (_) => Chatscreen(
+                                builder: (_) => ChatScreen(
                                   currentUser: widget.currentUser,
                                   otherUser: user,
                                 ),
