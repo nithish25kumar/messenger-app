@@ -41,9 +41,32 @@ class _ChatScreenState extends State<ChatScreen> {
       'receiverId': widget.otherUser['uid'],
       'message': message,
       'timestamp': FieldValue.serverTimestamp(),
+      'status': 'sent',
     });
 
     _messageController.clear();
+  }
+
+  void markMessagesAsSeen() async {
+    final chatId = getChatId(widget.currentUser.uid, widget.otherUser['uid']);
+
+    final messagesSnapshot = await FirebaseFirestore.instance
+        .collection('chats')
+        .doc(chatId)
+        .collection('messages')
+        .where('receiverId', isEqualTo: widget.currentUser.uid)
+        .where('status', isNotEqualTo: 'seen')
+        .get();
+
+    for (var doc in messagesSnapshot.docs) {
+      await doc.reference.update({'status': 'seen'});
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    markMessagesAsSeen();
   }
 
   String formatTimestamp(Timestamp timestamp) {
@@ -59,11 +82,12 @@ class _ChatScreenState extends State<ChatScreen> {
       appBar: AppBar(
         backgroundColor: AppColors.buttonlightmode,
         leading: IconButton(
-            onPressed: () {
-              Navigator.pushReplacement(context,
-                  MaterialPageRoute(builder: (_) => Bottomnavscreen()));
-            },
-            icon: Icon(Icons.arrow_back_ios_new)),
+          onPressed: () {
+            Navigator.pushReplacement(context,
+                MaterialPageRoute(builder: (_) => const Bottomnavscreen()));
+          },
+          icon: const Icon(Icons.arrow_back_ios_new),
+        ),
         title: Row(
           children: [
             CircleAvatar(
@@ -123,8 +147,20 @@ class _ChatScreenState extends State<ChatScreen> {
                   itemCount: messages.length,
                   itemBuilder: (context, index) {
                     final data = messages[index].data() as Map<String, dynamic>;
-
                     final isMe = data['senderId'] == widget.currentUser.uid;
+
+                    Icon? statusIcon;
+                    if (isMe) {
+                      final status = data['status'];
+                      if (status == 'sent') {
+                        statusIcon = const Icon(Icons.check, size: 16);
+                      } else if (status == 'seen') {
+                        statusIcon = const Icon(Icons.done_all,
+                            size: 16, color: Colors.blue);
+                      } else {
+                        statusIcon = const Icon(Icons.done_all, size: 16);
+                      }
+                    }
 
                     return Align(
                       alignment:
@@ -150,14 +186,24 @@ class _ChatScreenState extends State<ChatScreen> {
                               context: context,
                             ),
                             const SizedBox(height: 4),
-                            Text(
-                              data['timestamp'] != null
-                                  ? formatTimestamp(data['timestamp'])
-                                  : '',
-                              style: TextStyle(
-                                fontSize: 11,
-                                color: Colors.grey[600],
-                              ),
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                Text(
+                                  data['timestamp'] != null
+                                      ? formatTimestamp(data['timestamp'])
+                                      : '',
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    color: Colors.grey[600],
+                                  ),
+                                ),
+                                if (statusIcon != null) ...[
+                                  const SizedBox(width: 4),
+                                  statusIcon,
+                                ],
+                              ],
                             ),
                           ],
                         ),

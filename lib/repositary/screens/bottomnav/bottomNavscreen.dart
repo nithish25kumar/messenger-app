@@ -52,7 +52,7 @@ class _BottomnavscreenState extends State<Bottomnavscreen> {
           });
         },
         showSelectedLabels: true,
-        showUnselectedLabels: false,
+        showUnselectedLabels: true,
         backgroundColor: Colors.white,
       ),
       body: IndexedStack(

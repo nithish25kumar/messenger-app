@@ -20,11 +20,8 @@ class Morescreen extends StatefulWidget {
 
 class _MorescreenState extends State<Morescreen> {
   final List<Map<String, dynamic>> arrMore = [
-    {"icon": Icons.person, "txt": "Account"},
     {"icon": Icons.developer_board, "txt": "Creator Info"},
-    {"icon": Icons.notifications_active, "txt": "Notifications"},
     {"icon": Icons.privacy_tip, "txt": "Privacy"},
-    {"icon": Icons.mail, "txt": "Invite Your Friends"},
   ];
 
   String name = "";
@@ -113,31 +110,14 @@ class _MorescreenState extends State<Morescreen> {
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (_) => Accountscreen()));
+                                    builder: (_) => Creatorinfoscreen()));
                             break;
+
                           case 1:
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (_) => Creatorinfoscreen()));
-                            break;
-                          case 2:
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (_) => Notificationsscreen()));
-                            break;
-                          case 3:
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
                                     builder: (_) => Privacyscreen()));
-                            break;
-                          case 4:
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (_) => Invitefriendsscreen()));
                             break;
                         }
                       },
