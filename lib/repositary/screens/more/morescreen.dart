@@ -1,10 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:messenger_app/repositary/screens/AccountScreen/AccountScreen.dart';
 import 'package:messenger_app/repositary/screens/CreatorInfoScreen/CreatorInfoScreen.dart';
-import 'package:messenger_app/repositary/screens/InviteFriendsScreen/InviteFriendsScreen.dart';
-import 'package:messenger_app/repositary/screens/NotificationsScreen/NotificationsScreen.dart';
+
 import 'package:messenger_app/repositary/screens/PrivacyScreen/PrivacyScreen.dart';
 import 'package:messenger_app/repositary/screens/onboard/onboardingscreen.dart';
 import 'package:messenger_app/repositary/screens/widgets/Uihelper.dart';

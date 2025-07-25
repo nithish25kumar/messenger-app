@@ -1,16 +1,35 @@
-# messenger_app
+💬 Zynk – A Flutter Messenger App
 
-A new Flutter project.
+**Zynk** is a sleek and modern messaging app built using **Flutter**, offering real-time chatting, contact management, and media sharing. Integrated with **Firebase**, Zynk ensures seamless, secure, and fast communication between users — with a clean UI and smooth UX inspired by modern messenger apps.
 
-## Getting Started
+📱 [**Download APK**](https://drive.google.com/file/d/1Ubu_QyBbq5chnZpiFoSi5Ex6yE5ppUcN/view?usp=sharing)
+🐦 [**Twitter**](https://x.com/Nithish37951963)
+🔗 [**LinkedIn**](https://www.linkedin.com/in/nithish-kumar-9b29b3287/)
 
-This project is a starting point for a Flutter application.
+🧑‍💻 Developed By
 
-A few resources to get you started if this is your first Flutter project:
+**Nithish Kumar K**
+3rd Year M.Tech Integrated Software Engineering
+VIT University, Vellore
+📧 [nithish25may2005@gmail.com](mailto:nithish25may2005@gmail.com)
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+🚀 Features
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+* 🔐 Firebase Authentication (Google & Phone Sign-In)
+* 📞 Contact Search by Phone Number
+* 💬 Real-time 1-on-1 Messaging
+* 🧾 Recent Chats List
+* 🧑‍🤝‍🧑 Add & Manage Contacts
+* 🔍 Search Contacts by Name or Number
+* ⏱️ Message Timestamps and Status
+* 🧠 State Management with `Cubit` and `GetIt`
+
+ 🔧 Tech Stack
+
+* **Flutter**
+* **Firebase Auth**
+* **Cloud Firestore**
+* **Firebase Storage**
+* **Bloc (Cubit) + GetIt** for dependency injection & state management
+
+
