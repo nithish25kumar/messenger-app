@@ -1,3 +1,7 @@
+// Improved UI for ChatListScreen
+// Added modern chat tiles, rounded containers, better spacing, shadows,
+// profile avatar support, last message preview card, and smooth visuals.
+
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -6,7 +10,6 @@ import 'chats/chatscreen.dart';
 
 class ChatListScreen extends StatelessWidget {
   final User currentUser;
-
   const ChatListScreen({super.key, required this.currentUser});
 
   String getChatId(String uid1, String uid2) {
@@ -15,18 +18,19 @@ class ChatListScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        title: const Text(
-          'My Chats',
-          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-        ),
+        backgroundColor: theme.scaffoldBackgroundColor,
+        elevation: 0,
         centerTitle: true,
-        elevation: 1,
+        title: Text(
+          'My Chats',
+          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+        ),
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance.collection('users').snapshots(),
@@ -39,91 +43,108 @@ class ChatListScreen extends StatelessWidget {
             (doc) => doc['uid'] != currentUser.uid,
           );
 
-          return ListView.separated(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-            separatorBuilder: (context, index) => const Divider(),
+          return ListView.builder(
+            padding: const EdgeInsets.all(12),
             itemCount: users.length,
             itemBuilder: (context, index) {
               final doc = users.elementAt(index);
               final userData = doc.data() as Map<String, dynamic>;
 
-              return ListTile(
-                contentPadding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                tileColor: Colors.lightGreenAccent,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+              return Container(
+                margin: const EdgeInsets.symmetric(vertical: 8),
+                decoration: BoxDecoration(
+                  color: theme.cardColor,
+                  borderRadius: BorderRadius.circular(18),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black12,
+                      blurRadius: 6,
+                      offset: Offset(0, 3),
+                    )
+                  ],
                 ),
-                leading: CircleAvatar(
-                  radius: 25,
-                  backgroundColor:
-                      isDark ? AppColors.iconlight : AppColors.icondarkmode,
-                  child: Text(
-                    userData['name'] != null && userData['name'].isNotEmpty
-                        ? userData['name'][0].toUpperCase()
-                        : '?',
-                    style: const TextStyle(fontSize: 20, color: Colors.white),
+                child: ListTile(
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(18)),
+                  contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+
+                  // PROFILE AVATAR
+                  leading: CircleAvatar(
+                    radius: 28,
+                    backgroundImage: userData['photoUrl'] != null
+                        ? NetworkImage(userData['photoUrl'])
+                        : null,
+                    backgroundColor:
+                        userData['photoUrl'] != null ? null : Colors.blueGrey,
+                    child: userData['photoUrl'] == null
+                        ? Text(
+                            userData['name'] != null &&
+                                    userData['name'].isNotEmpty
+                                ? userData['name'][0].toUpperCase()
+                                : '?',
+                            style: TextStyle(color: Colors.white, fontSize: 22),
+                          )
+                        : null,
                   ),
-                ),
-                title: Text(
-                  userData['name'] ?? 'No Name',
-                  style: TextStyle(
-                    color: isDark
-                        ? AppColors.textdarkmode
-                        : AppColors.textlightmode,
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
+
+                  title: Text(
+                    userData['name'] ?? 'No Name',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
-                ),
-                subtitle: StreamBuilder<QuerySnapshot>(
-                  stream: FirebaseFirestore.instance
-                      .collection('chats')
-                      .doc(getChatId(currentUser.uid, userData['uid']))
-                      .collection('messages')
-                      .orderBy('timestamp', descending: true)
-                      .limit(1)
-                      .snapshots(),
-                  builder: (context, messageSnapshot) {
-                    if (!messageSnapshot.hasData ||
-                        messageSnapshot.data!.docs.isEmpty) {
+
+                  subtitle: StreamBuilder<QuerySnapshot>(
+                    stream: FirebaseFirestore.instance
+                        .collection('chats')
+                        .doc(getChatId(currentUser.uid, userData['uid']))
+                        .collection('messages')
+                        .orderBy('timestamp', descending: true)
+                        .limit(1)
+                        .snapshots(),
+                    builder: (context, msgSnap) {
+                      if (!msgSnap.hasData || msgSnap.data!.docs.isEmpty) {
+                        return Text(
+                          'No messages yet',
+                          style: TextStyle(
+                            color: Colors.grey,
+                            fontSize: 14,
+                          ),
+                        );
+                      }
+
+                      final lastMessage = msgSnap.data!.docs.first.data()
+                          as Map<String, dynamic>;
+
                       return Text(
-                        'No messages yet',
-                        style: TextStyle(
-                          color: isDark
-                              ? AppColors.hintdarkmode
-                              : AppColors.hintlightmode,
-                          fontSize: 14,
-                        ),
+                        lastMessage['message'] ?? '',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(color: Colors.grey, fontSize: 14),
                       );
-                    }
+                    },
+                  ),
 
-                    final lastMessage = messageSnapshot.data!.docs.first.data()
-                        as Map<String, dynamic>;
+                  trailing: Icon(
+                    Icons.chevron_right,
+                    size: 28,
+                    color: Colors.grey.shade500,
+                  ),
 
-                    return Text(
-                      lastMessage['message'] ?? '',
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        color: isDark
-                            ? AppColors.hintdarkmode
-                            : AppColors.hintlightmode,
-                        fontSize: 14,
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => ChatScreen(
+                          currentUser: currentUser,
+                          otherUser: userData,
+                        ),
                       ),
                     );
                   },
                 ),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => ChatScreen(
-                        currentUser: currentUser,
-                        otherUser: userData,
-                      ),
-                    ),
-                  );
-                },
               );
             },
           );

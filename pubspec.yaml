@@ -23,6 +23,14 @@ dependencies:
 
 
 
+  web3dart:
+  http:
+  encrypt:
+  crypto:
+  pointycastle:
+
+
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

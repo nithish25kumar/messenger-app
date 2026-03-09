@@ -7,8 +7,41 @@ import 'package:messenger_app/repositary/screens/bottomnav/bottomNavscreen.dart'
 import 'package:messenger_app/repositary/screens/login/loginscreen.dart';
 import 'package:messenger_app/repositary/screens/widgets/Uihelper.dart';
 
-class Onboardingscreen extends StatelessWidget {
+class Onboardingscreen extends StatefulWidget {
   const Onboardingscreen({super.key});
+
+  @override
+  State<Onboardingscreen> createState() => _OnboardingscreenState();
+}
+
+class _OnboardingscreenState extends State<Onboardingscreen> {
+  @override
+  void initState() {
+    super.initState();
+    _checkLogin();
+  }
+
+  void _checkLogin() async {
+    final user = FirebaseAuth.instance.currentUser;
+
+    if (user != null) {
+      final userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .get();
+
+      if (userDoc.exists) {
+        await Future.delayed(const Duration(milliseconds: 500));
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (_) => const Bottomnavscreen(),
+          ),
+        );
+      }
+    }
+  }
 
   Future<void> _signInWithGoogle(BuildContext context) async {
     try {
@@ -28,6 +61,7 @@ class Onboardingscreen extends StatelessWidget {
 
       UserCredential result =
           await FirebaseAuth.instance.signInWithCredential(credential);
+
       final User? user = result.user;
 
       if (user != null) {
@@ -45,7 +79,7 @@ class Onboardingscreen extends StatelessWidget {
         } else {
           await FirebaseAuth.instance.signOut();
           await GoogleSignIn().signOut();
-          Uihelper.showSnackBar(context, "No account found for ${email}");
+          Uihelper.showSnackBar(context, "No account found for $email");
         }
       }
     } catch (e) {
@@ -60,7 +94,7 @@ class Onboardingscreen extends StatelessWidget {
         backgroundColor: Colors.white,
         elevation: 0,
         title: Uihelper.CustomText(
-            text: "Zynk-Messenger",
+            text: "Chat-Ledger",
             fontsize: 25,
             fontweight: FontWeight.bold,
             fontfamily: "bold",
@@ -72,38 +106,49 @@ class Onboardingscreen extends StatelessWidget {
         child: Center(
           child: Column(
             children: [
-              SizedBox(
-                height: 40,
-              ),
+              const SizedBox(height: 40),
               Uihelper.CustomImage(imgurl: "intro.png"),
               const SizedBox(height: 90),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Uihelper.CustomText(
-                    text:
-                        "Vibe, chat, repeat.\nStay close, no matter the coast 🌍",
-                    fontsize: 22,
-                    fontweight: FontWeight.bold,
-                    context: context,
-                  ),
+                  Column(
+                    children: [
+                      Uihelper.CustomText(
+                        text: "Blockchain",
+                        fontsize: 26,
+                        fontweight: FontWeight.bold,
+                        context: context,
+                      ),
+                      Uihelper.CustomText(
+                        text: "Powered App",
+                        fontsize: 20,
+                        fontweight: FontWeight.w500,
+                        context: context,
+                      ),
+                    ],
+                  )
                 ],
               ),
-              const SizedBox(height: 170),
+              const SizedBox(height: 300),
               Uihelper.CustomButton(
                 buttonnname: "Start Messaging",
                 callback: () {
                   final user = FirebaseAuth.instance.currentUser;
+
                   if (user != null) {
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
-                          builder: (_) => const Bottomnavscreen()),
+                        builder: (_) => const Bottomnavscreen(),
+                      ),
                     );
                   } else {
                     Navigator.pushReplacement(
                       context,
-                      MaterialPageRoute(builder: (_) => Loginscreen()),
+                      MaterialPageRoute(
+                        builder: (_) => Loginscreen(),
+                      ),
                     );
                   }
                 },
