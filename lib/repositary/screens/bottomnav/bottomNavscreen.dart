@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:messenger_app/repositary/screens/contacts/contactscreen.dart';
 import 'package:messenger_app/repositary/screens/more/morescreen.dart';
 import '../chatlist.dart';
@@ -30,34 +31,60 @@ class _BottomnavscreenState extends State<Bottomnavscreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      bottomNavigationBar: BottomNavigationBar(
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person_2_outlined),
-            label: "Contacts",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.chat_bubble_outline_rounded),
-            label: "Chats",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.more_horiz),
-            label: "More",
-          ),
-        ],
-        currentIndex: currentIndex,
-        onTap: (value) {
-          setState(() {
-            currentIndex = value;
-          });
-        },
-        showSelectedLabels: true,
-        showUnselectedLabels: true,
-        backgroundColor: Colors.white,
-      ),
+      backgroundColor: Colors.white,
       body: IndexedStack(
         index: currentIndex,
         children: pages,
+      ),
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              blurRadius: 20,
+              color: Colors.black.withOpacity(.05),
+            )
+          ],
+        ),
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 8),
+            child: GNav(
+              rippleColor: Colors.grey[300]!,
+              hoverColor: Colors.grey[100]!,
+              gap: 8,
+              activeColor:
+                  Theme.of(context).primaryColor, // Active icon & text color
+              iconSize: 24,
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              duration: const Duration(milliseconds: 400),
+              tabBackgroundColor: Theme.of(context)
+                  .primaryColor
+                  .withOpacity(0.1), // Pill background
+              color: Colors.grey[600], // Unselected icon color
+              tabs: const [
+                GButton(
+                  icon: Icons.person_2_outlined,
+                  text: 'Contacts',
+                ),
+                GButton(
+                  icon: Icons.chat_bubble_outline_rounded,
+                  text: 'Chats',
+                ),
+                GButton(
+                  icon: Icons.more_horiz,
+                  text: 'More',
+                ),
+              ],
+              selectedIndex: currentIndex,
+              onTabChange: (index) {
+                setState(() {
+                  currentIndex = index;
+                });
+              },
+            ),
+          ),
+        ),
       ),
     );
   }

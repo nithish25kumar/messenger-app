@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:messenger_app/domain/constants/appcolors.dart';
 import 'package:messenger_app/repositary/screens/bottomnav/bottomNavscreen.dart';
 import 'package:messenger_app/repositary/screens/login/loginscreen.dart';
 import 'package:messenger_app/repositary/screens/widgets/Uihelper.dart';
@@ -91,7 +90,7 @@ class _OnboardingscreenState extends State<Onboardingscreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.green,
         elevation: 0,
         title: Uihelper.CustomText(
             text: "Chat-Ledger",
