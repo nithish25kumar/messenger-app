@@ -220,7 +220,6 @@ class _ContactscreenState extends State<Contactscreen>
 
     if (showAddButton) return tile;
 
-    // Swipe to remove for existing contacts
     return Dismissible(
       key: Key(user['uid']),
       direction: DismissDirection.endToStart,

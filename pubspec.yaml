@@ -32,6 +32,7 @@ dependencies:
   encrypt:
   crypto:
   pointycastle:
+  package_info_plus: ^9.0.1
 
 
 
